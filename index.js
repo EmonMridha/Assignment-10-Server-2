@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 const app = express();
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 require('dotenv').config()
 const port = process.env.PORT || 3000;
@@ -15,24 +15,50 @@ const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  }
+    serverApi: {
+        version: ServerApiVersion.v1,
+        strict: true,
+        deprecationErrors: true,
+    }
 });
 
 async function run() {
-  try {
-    // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
-    // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
-  } finally {
-    // Ensures that the client will close when you finish/error
-    await client.close();
-  }
+    try {
+        // Connect the client to the server	(optional starting in v4.7)
+        await client.connect();
+
+        const plantCollection = client.db('plantDB').collection('plants');  
+
+
+        app.get('/plants', async (req,res)=>{
+            const result = await plantCollection.find().toArray(); //Fetching all plant data from database
+            res.send(result); //Sending fetched data to client
+        })
+
+        app.get('/plants/:id', async (req, res) => {
+            const id = req.params.id; // Getting id from request parameters
+            const query = {_id: new ObjectId(id)}; // Converting string id into mongodb object id
+            const result = await plantCollection.findOne(query); // Commanding to find the plant with specific id and store here
+            res.send(result); //Sending fetched data to client
+        })
+
+
+        app.post('/plants', async (req, res) => {
+            const newPlant = req.body;
+            console.log(newPlant);
+            const result = await plantCollection.insertOne(newPlant) //Inserting newPlant data into database and storing insertedId in here
+            res.send(result) // Sending confirmation and insertedId back to client
+        });
+
+
+
+        // Send a ping to confirm a successful connection
+        await client.db("admin").command({ ping: 1 });
+        console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    } finally {
+        // Ensures that the client will close when you finish/error
+        // await client.close();
+    }
 }
 run().catch(console.dir);
 
