@@ -42,9 +42,16 @@ async function run() {
             res.send(result); //Sending fetched data to client
         })
 
+        app.get('/userPlants/:email', async (req, res)=>{
+            const email = req.params.email; //  Getting the email from request parameters
+            const plantCollection = client.db('plantDB').collection('plants'); // Huddai
+            const result = await plantCollection.find({email}).toArray(); // commanding to find all plants with specific email and store here
+            res.send(result); // Sending fetched data to client
+        })
+
 
         app.post('/plants', async (req, res) => {
-            const newPlant = req.body;
+            const newPlant = req.body; 
             console.log(newPlant);
             const result = await plantCollection.insertOne(newPlant) //Inserting newPlant data into database and storing insertedId in here
             res.send(result) // Sending confirmation and insertedId back to client
