@@ -57,6 +57,13 @@ async function run() {
             res.send(result) // Sending confirmation and insertedId back to client
         });
 
+        app.delete('/plants/:id', async (req, res) => {
+            const id = req.params.id; // Getting id from request parameters
+            const query = { _id: new ObjectId(id)}; //Converting string id into mongodb object id
+            const result = await plantCollection.deleteOne(query); //Commanding to delete the plant with specific id and store the confirmation here...
+            res.send(result); // Sending the delete confirmation to the client 
+        })
+
 
 
         // Send a ping to confirm a successful connection
