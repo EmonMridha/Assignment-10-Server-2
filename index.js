@@ -57,6 +57,19 @@ async function run() {
             res.send(result) // Sending confirmation and insertedId back to client
         });
 
+        app.put('/plants/:id', async (req,res)=> {
+            const id = req.params.id; // Getting id from the request parameters
+            const filter = {id: new ObjectId(id)} // Converting string id into mongodb object id
+            const options = {upsert: true}; // Emny
+            const updatedPlant = req.body; // Getting updated plant data from the request body
+            const updatedDoc = {
+                $set: updatedPlant 
+            }
+
+            const result = await plantCollection.updateOne(filter, updatedDoc, options) // Commanding to update the plant with specific id with the updatedPlant data
+            res.send(result) //  Sending the update confirmation to the client
+        })
+
         app.delete('/plants/:id', async (req, res) => {
             const id = req.params.id; // Getting id from request parameters
             const query = { _id: new ObjectId(id)}; //Converting string id into mongodb object id
