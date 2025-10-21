@@ -59,7 +59,7 @@ async function run() {
 
         app.put('/plants/:id', async (req,res)=> {
             const id = req.params.id; // Getting id from the request parameters
-            const filter = {id: new ObjectId(id)} // Converting string id into mongodb object id
+            const filter = {_id: new ObjectId(id)} // Converting string id into mongodb object id
             const options = {upsert: true}; // Emny
             const updatedPlant = req.body; // Getting updated plant data from the request body
             const updatedDoc = {
